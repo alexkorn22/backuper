@@ -12,7 +12,7 @@ return array(
         'tar_cmd' => '/bin/tar',
 
         'backup_filename_prefix' => $prefix,
-        'backup_filename' => 'backupname',
+        'backup_filename' => 'test',
     ),
     // backup options
     'backup' => array(
@@ -32,23 +32,23 @@ return array(
                 )
             )
         ),
-        // database backup
-        'mysql' => array(
-            'mysqldump_cmd' => '/usr/bin/mysqldump',
-            'user' => 'root',
-            'password' => 'xxx',
-            'host' => 'localhost',
-            'items' => array(
-                array(
-                    'db_name' => 'xxx',
-                    'ignore_tables' => 'test',
-                    'tables_structure' => 'logs,sessions',
-                ),
-                array(
-                    'db_name' => 'xxx2',
-                ),
-            ),
-        ),
+       // database backup
+//        'mysql' => array(
+//            'mysqldump_cmd' => '/usr/bin/mysqldump',
+//            'user' => 'root',
+//            'password' => 'xxx',
+//            'host' => 'localhost',
+//            'items' => array(
+//                array(
+//                    'db_name' => 'xxx',
+//                    'ignore_tables' => 'test',
+//                    'tables_structure' => 'logs,sessions',
+//                ),
+//                array(
+//                    'db_name' => 'xxx2',
+//                ),
+//            ),
+//        ),
     ),
     // upload backup options
     'upload' => array(
@@ -58,25 +58,25 @@ return array(
             'path' => '/backups',
         ),
         // upload to ftp
-        'ftp' => array(
-            'max_count' => 3,
-            'path' => '/backups',
-            'host' => 'xxx',
-            'user' => 'xxx',
-            'password' => 'xxx'
-        ),
+//        'ftp' => array(
+//            'max_count' => 3,
+//            'path' => '/backups',
+//            'host' => 'xxx',
+//            'user' => 'xxx',
+//            'password' => 'xxx'
+//        ),
     ),
     // notification options
     'nofification' => array(
         // email notification
         'email' => array(
             'on_success' => array(
-                'to' => 'xxx@xxx.xxx',
+                'to' => 'kornsasha89@gmail.com',
                 'subject' => 'Success backup',
                 'template' => realpath(__DIR__ . '/../Command/Notification/email_templates/success.php')
             ),
             'on_failed' => array(
-                'to' => 'xxx@xxx.xxx',
+                'to' => 'kornsasha89@gmail.com',
                 'subject' => 'Failed backup',
                 'template' => realpath(__DIR__ . '/../Command/Notification/email_templates/failed.php')
             ),
