@@ -3,7 +3,6 @@ require_once '../functions.php';
 // register autoloader
 define('ROOT', dirname(__DIR__));
 spl_autoload_register(function ($class) {
-
     $arPath = explode('\\',$class);
     if ($arPath[0] == 'BackupTask') {
         $arPath[0] = 'backuper';
