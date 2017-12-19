@@ -3,53 +3,54 @@
 class Backuper{
 
     protected $root;
+    protected $nameFile = '';
+    protected $nameDb = '';
+    protected $strCmdFiles = '';
+    protected $folderInput = 'backuper/backup';
+    protected $excludes = [];
 
-    public function __construct(){
+    protected function __construct(){
         $this->root = $_SERVER['DOCUMENT_ROOT'];
     }
 
-    public static function Factory($config) {
+    public static function Factory($options) {
         $item = new Backuper();
+        $item->makeNameFile();
+        $item->excludes[] = $item->folderInput;
+        mkdir($_SERVER['DOCUMENT_ROOT'] . '/' . $item->folderInput);
+
         return $item;
     }
 
     public function makeBackupFiles() {
-       $tmpDir = sys_get_temp_dir();
-           $path = '../';
         // build command
-        $outputFile =  'backups/test' . '.tar';
-        $cmd = strtr('@tar -cf @output  @dir @file', array(
+        $ext =  'tar';
+        $out = $this->folderInput . '/' . $this->nameFile . '.' . $ext;
+        $this->strCmdFiles = strtr('@tar -cf @output  @dir @file', array(
             '@tar' => 'tar',
-            '@output' => $outputFile,
-            '@dir' => $path,
-            '@file' => ''//basename($path),
+            '@output' => $out,
+            '@dir' => '../',
+            '@file' => '',
         ));
         // exclude files
-        $option['exclude'] = 'backuper/backups';
-        if (!empty($option['exclude'])) {
-            foreach (explode(',', $option['exclude']) as $file) {
-                $cmd .= strtr(' --exclude="@file"', array(
-                    '@file' => trim($file)
-                ));
-            }
-        }
+        $this->addExludes();
+        var_dump($this->strCmdFiles);
+        shell_exec($this->strCmdFiles);
+    }
 
-        var_dump($cmd);
-        shell_exec($cmd);
+    protected function addExludes() {
+        foreach ($this->excludes as $file) {
+            $this->strCmdFiles .= strtr(' --exclude="@file"', array(
+                '@file' => trim($file)
+            ));
+        }
+    }
+
+    protected function makeNameFile() {
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $this->nameFile = $_SERVER['HTTP_HOST'];
+        }
+        $this->nameFile .= '_' . date('Ymd_his');
     }
 
 }
-//https://github.com/AlexeyFreelancer/BackupTask
-// example
-function backupFiles($backup_folder, $backup_name, $dir)
-{
-    $fullFileName = $backup_folder . '/' . $backup_name . '.tar.gz';
-    shell_exec("tar -cvf " . $fullFileName . " " . $dir . "/* ");
-    return $fullFileName;
-}
-
-$backup_folder = './backup';    // куда будут сохранятся файлы
-$backup_name = 'my_site_backup';    // имя архива
-$dir = './sxd';    // что бэкапим
-//backupFiles($backup_folder,$backup_name, $dir);
-//shell_exec("tar -zcf ./archive_name.tar.gz ./");
