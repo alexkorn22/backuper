@@ -15,5 +15,6 @@ echo "<pre>$output</pre>";
 var_dump(class_exists('PEAR'));
 $tar = new Archive_Tar('test.tar');
 $tar->_debug = true;
+$tar->setIgnoreList(['backup']);
 $tar->add(['../site']);
 var_dump($tar);
