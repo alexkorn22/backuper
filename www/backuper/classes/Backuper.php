@@ -10,6 +10,7 @@ class Backuper{
     protected $nameFile = '';
     protected $extFileTar = '.tar';
     protected $outputFolder = 'backups';
+    protected $rootFolderName = 'backuper';
     protected $excluded = ['../backuper'];
     protected $nameDb = '';
 
@@ -25,6 +26,7 @@ class Backuper{
         $item = new Backuper();
         $item->root = $_SERVER['DOCUMENT_ROOT'];
         $item->makeNameFile();
+        $item->makeOutputFolder();
 
         $item->tar = new Archive_Tar($item->outputFolder . '/'. $item->nameFile . $item->extFileTar);
         $item->tar->_debug = true;
@@ -33,7 +35,7 @@ class Backuper{
         //mkdir($_SERVER['DOCUMENT_ROOT'] . '/' . $item->folderInput);
 
         // for debug
-       unlink($item->root . '/backuper/' . $item->outputFolder . '/' . $item->nameFile . $item->extFileTar);
+       unlink($item->root . '/' . $item->rootFolderName .'/' . $item->outputFolder . '/' . $item->nameFile . $item->extFileTar);
 
         return $item;
     }
@@ -47,7 +49,7 @@ class Backuper{
     protected function addFilesToTar() {
         foreach (glob($this->root . '/*') as $file) {
             $nameFile = basename($file);
-            if ($nameFile == 'backuper') {
+            if ($nameFile == $this->rootFolderName) {
                 continue;
             }
             $this->addFileToTar($nameFile);
@@ -72,6 +74,13 @@ class Backuper{
         }
         //$this->nameFile = 'test';
         $this->nameFile .= '_' . date('Ymd');
+    }
+
+    protected function makeOutputFolder() {
+        $folder = $this->root . '/'. $this->rootFolderName . '/' . $this->outputFolder;
+        if (!file_exists($folder)) {
+            mkdir($folder);
+        }
     }
 
 }
