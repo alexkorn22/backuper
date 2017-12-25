@@ -15,12 +15,7 @@ $dir = './sxd';    // что бэкапим
 //shell_exec("tar -zcf ./archive_name.tar.gz ./");
 
 $config = [
-    'files' => [
-        'active' => 'Y',                // активность
-        'excludedFolders' => [          //папки исключения
 
-        ],
-    ]
 ];
 
 return $config;
