@@ -7,13 +7,14 @@ class Backuper{
      */
     protected $tar;
     protected $root;
+    protected $doFiles = true;
+    protected $doSql = true;
     protected $nameFile = '';
     protected $extFileTar = '.tar';
     protected $outputFolder = 'backups';
     protected $rootFolderName = 'backuper';
     protected $excluded = ['../backuper'];
     protected $nameDb = '';
-
 
     protected function __construct(){
         $this->root = $_SERVER['DOCUMENT_ROOT'];
@@ -27,6 +28,8 @@ class Backuper{
         $item->root = $_SERVER['DOCUMENT_ROOT'];
         $item->makeNameFile();
         $item->makeOutputFolder();
+
+        $item->setOptions($options);
 
         $item->tar = new Archive_Tar($item->outputFolder . '/'. $item->nameFile . $item->extFileTar);
         $item->tar->_debug = true;
@@ -80,6 +83,18 @@ class Backuper{
         $folder = $this->root . '/'. $this->rootFolderName . '/' . $this->outputFolder;
         if (!file_exists($folder)) {
             mkdir($folder);
+        }
+    }
+
+    protected function setOptions($options) {
+        if (!$options['files']['active']) {
+            $this->doFiles = false;
+        }
+        if (!$options['db']['active']) {
+            $this->doSql = false;
+        }
+        foreach ($options['files']['excludedFolders'] as $excludedFolder) {
+            $this->excluded[] = $excludedFolder;
         }
     }
 
