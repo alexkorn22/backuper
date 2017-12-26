@@ -8,13 +8,17 @@ class Backuper{
     protected $tar;
     protected $root;
     protected $doFiles = true;
-    protected $doSql = true;
+    protected $doDb = true;
     protected $nameFile = '';
     protected $extFileTar = '.tar';
     protected $outputFolder = 'backups';
     protected $rootFolderName = 'backuper';
     protected $excluded = ['../backuper'];
     protected $nameDb = '';
+    protected $dbHost = 'localhost';
+    protected $dbUser = 'mysql';
+    protected $dbPass = '1111';
+    protected $dbName = 'test';
 
     protected function __construct(){
         $this->root = $_SERVER['DOCUMENT_ROOT'];
@@ -34,11 +38,11 @@ class Backuper{
         $item->tar = new Archive_Tar($item->outputFolder . '/'. $item->nameFile . $item->extFileTar);
         $item->tar->_debug = true;
 
-        //$item->excludes[] = $item->folderInput;
-        //mkdir($_SERVER['DOCUMENT_ROOT'] . '/' . $item->folderInput);
-
         // for debug
-       unlink($item->root . '/' . $item->rootFolderName .'/' . $item->outputFolder . '/' . $item->nameFile . $item->extFileTar);
+        $nameFile = $item->root . '/' . $item->rootFolderName .'/' . $item->outputFolder . '/' . $item->nameFile . $item->extFileTar;
+        if (file_exists($nameFile)) {
+            unlink($nameFile);
+        }
 
         return $item;
     }
@@ -46,7 +50,31 @@ class Backuper{
     public function makeBackupFiles() {
         $this->tar->setIgnoreList($this->getListIgnoreFiles());
         $this->addFilesToTar();
-        debug($this->tar);
+    }
+
+    public function makeBackupDb() {
+        $fullFileName = '../' . $this->nameFile . '.sql';
+        $command = 'mysqldump -h ' . $this->dbHost . ' -u ' . $this->dbUser . ' -p' . $this->dbPass . ' ' . $this->dbName. ' > ' . $fullFileName;
+       shell_exec($command);
+      // $this->addFileToTar($this->nameFile . '.sql');
+    }
+
+    public function run() {
+        if ($this->doDb) {
+            $this->makeBackupDb();
+        }
+        if ($this->doFiles) {
+            $this->makeBackupFiles();
+        }
+        $this->deleteDbFile();
+        echo 'success';
+    }
+
+    protected function deleteDbFile() {
+        $nameFileDb = $this->root . '/' . $this->nameFile . '.sql';
+        if (file_exists($nameFileDb)) {
+            unlink($nameFileDb);
+        }
     }
 
     protected function addFilesToTar() {
@@ -91,11 +119,17 @@ class Backuper{
             $this->doFiles = false;
         }
         if (!$options['db']['active']) {
-            $this->doSql = false;
+            $this->doDb = false;
         }
         foreach ($options['files']['excludedFolders'] as $excludedFolder) {
             $this->excluded[] = $excludedFolder;
         }
+
+        $this->dbHost = $options['db']['host'];
+        $this->dbName = $options['db']['name'];
+        $this->dbUser = $options['db']['user'];
+        $this->dbPass = $options['db']['password'];
+
     }
 
 }

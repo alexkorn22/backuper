@@ -9,6 +9,10 @@ $config = [
     ],
     'db' => [
         'active' => true,                // активность
+        'host' => 'localhost',
+        'user' => 'mysql',
+        'password' => '1111',
+        'name' => 'test',
     ]
 ];
 
