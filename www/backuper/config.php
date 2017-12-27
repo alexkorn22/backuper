@@ -16,5 +16,4 @@ $config = [
         'name' => 'test',
     ]
 ];
-
 return $config;

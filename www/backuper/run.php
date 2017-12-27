@@ -10,7 +10,11 @@ require_once 'functions.php';
 require_once 'classes/Backuper.php';
 require_once 'classes/View.php';
 // config
-$config = include_once 'config.php';
+$config = [];
+if (is_file('config.php')) {
+    $config = include 'config.php';
+}
+
 //defines
 define('ROOT', dirname(__FILE__));
 
@@ -35,6 +39,10 @@ if (empty($argv)) {
 } else {
 
     echo "Console\n";
+    if (empty($config)) {
+        echo 'Не найден файл параметров config.php';
+        die();
+    }
     $backuper = Backuper::Factory($config);
     $backuper->run();
 };
