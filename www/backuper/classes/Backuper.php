@@ -101,7 +101,7 @@ class Backuper{
     }
 
     protected function makeNameFile() {
-        $this->nameFile .= '_' . date('Ymd');
+        $this->nameFile .= '_' . date('Ymd_His');
     }
 
     protected function makeOutputFolder() {

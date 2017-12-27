@@ -1,6 +1,5 @@
 <?php
 
-
 $config = [
     'prefixArchive' => 'backuper',
     'files' => [
