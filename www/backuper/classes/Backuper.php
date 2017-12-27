@@ -69,7 +69,7 @@ class Backuper{
             $this->makeBackupFiles();
         }
         $this->deleteDbFile();
-        echo 'success';
+        echo "\nsuccess";
     }
 
     protected function deleteDbFile() {
