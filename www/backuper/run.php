@@ -10,7 +10,7 @@ require_once 'functions.php';
 require_once 'classes/Backuper.php';
 require_once 'classes/View.php';
 // config
-$config = require_once 'config.php';
+$config = include_once 'config.php';
 //defines
 define('ROOT', dirname(__FILE__));
 
@@ -21,8 +21,12 @@ if (empty($argv)) {
         if (isset($_POST['config'])) {
             $config = json_decode($_POST['config']);
         }
-        //$backuper = Backuper::Factory($config);
-        //$backuper->run();
+        if (empty($config)) {
+            $view->render('errors',['errors' => ['Не найден файл параметров config.php']]);
+            die();
+        }
+        $backuper = Backuper::Factory($config);
+        $backuper->run();
         $view->render('main');
     } else {
         $view->render('auth',['action'=>'/backuper/run.php']);
