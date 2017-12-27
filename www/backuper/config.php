@@ -2,6 +2,7 @@
 
 
 $config = [
+    'prefixArchive' => 'backuper',
     'files' => [
         'active' => true,                // активность
         'excludedFolders' => [          //папки исключения

@@ -13,7 +13,7 @@ class Backuper{
     protected $extFileTar = '.tar';
     protected $outputFolder = 'backups';
     protected $rootFolderName = 'backuper';
-    protected $excluded = ['../backuper'];
+    protected $excluded = [];
     protected $nameDb = '';
     protected $dbHost = 'localhost';
     protected $dbUser = 'mysql';
@@ -21,7 +21,9 @@ class Backuper{
     protected $dbName = 'test';
 
     protected function __construct(){
-        $this->root = $_SERVER['DOCUMENT_ROOT'];
+        $this->root = dirname(__DIR__);
+        $this->root = dirname($this->root);
+        $this->excluded = ['..' . DIRECTORY_SEPARATOR . 'backuper'];
     }
 
     public static function Factory($options) {
@@ -29,17 +31,17 @@ class Backuper{
         require_once 'Tar.php';
 
         $item = new Backuper();
-        $item->root = $_SERVER['DOCUMENT_ROOT'];
-        $item->makeNameFile();
         $item->makeOutputFolder();
-
         $item->setOptions($options);
+        $item->makeNameFile();
 
-        $item->tar = new Archive_Tar($item->outputFolder . '/'. $item->nameFile . $item->extFileTar);
+        $item->tar = new Archive_Tar($item->outputFolder . DIRECTORY_SEPARATOR . $item->nameFile . $item->extFileTar);
         $item->tar->_debug = true;
 
         // for debug
-        $nameFile = $item->root . '/' . $item->rootFolderName .'/' . $item->outputFolder . '/' . $item->nameFile . $item->extFileTar;
+        $nameFile = $item->root . DIRECTORY_SEPARATOR . $item->rootFolderName .
+            DIRECTORY_SEPARATOR. $item->outputFolder .
+            DIRECTORY_SEPARATOR. $item->nameFile . $item->extFileTar;
         if (file_exists($nameFile)) {
             unlink($nameFile);
         }
@@ -53,7 +55,7 @@ class Backuper{
     }
 
     public function makeBackupDb() {
-        $fullFileName = '../' . $this->nameFile . '.sql';
+        $fullFileName = '..' . DIRECTORY_SEPARATOR . $this->nameFile . '.sql';
         $command = 'mysqldump -h ' . $this->dbHost . ' -u ' . $this->dbUser . ' -p' . $this->dbPass . ' ' . $this->dbName. ' > ' . $fullFileName;
        shell_exec($command);
       // $this->addFileToTar($this->nameFile . '.sql');
@@ -71,14 +73,14 @@ class Backuper{
     }
 
     protected function deleteDbFile() {
-        $nameFileDb = $this->root . '/' . $this->nameFile . '.sql';
+        $nameFileDb = $this->root . DIRECTORY_SEPARATOR . $this->nameFile . '.sql';
         if (file_exists($nameFileDb)) {
             unlink($nameFileDb);
         }
     }
 
     protected function addFilesToTar() {
-        foreach (glob($this->root . '/*') as $file) {
+        foreach (glob($this->root . DIRECTORY_SEPARATOR . '*') as $file) {
             $nameFile = basename($file);
             if ($nameFile == $this->rootFolderName) {
                 continue;
@@ -88,27 +90,23 @@ class Backuper{
     }
 
     protected function addFileToTar($path) {
-        $this->tar->add(['../' . $path]);
+        $this->tar->add(['..' . DIRECTORY_SEPARATOR . $path]);
     }
 
     protected function getListIgnoreFiles() {
         $res = [];
         foreach ($this->excluded as $file) {
-            $res[] = '../' . $file;
+            $res[] = '..' . DIRECTORY_SEPARATOR . $file;
         }
         return $res;
     }
 
     protected function makeNameFile() {
-        if (isset($_SERVER['HTTP_HOST'])) {
-            $this->nameFile = $_SERVER['HTTP_HOST'];
-        }
-        //$this->nameFile = 'test';
         $this->nameFile .= '_' . date('Ymd');
     }
 
     protected function makeOutputFolder() {
-        $folder = $this->root . '/'. $this->rootFolderName . '/' . $this->outputFolder;
+        $folder = $this->root . DIRECTORY_SEPARATOR. $this->rootFolderName . DIRECTORY_SEPARATOR . $this->outputFolder;
         if (!file_exists($folder)) {
             mkdir($folder);
         }
@@ -124,6 +122,8 @@ class Backuper{
         foreach ($options['files']['excludedFolders'] as $excludedFolder) {
             $this->excluded[] = $excludedFolder;
         }
+
+        $this->nameFile = $options['prefixArchive'];
 
         $this->dbHost = $options['db']['host'];
         $this->dbName = $options['db']['name'];
