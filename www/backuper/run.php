@@ -4,7 +4,6 @@ date_default_timezone_set('Europe/Kiev');
 
 //TOKEN
 define('TOKEN', '1111');
-
 //requires
 require_once 'functions.php';
 require_once 'classes/Backuper.php';

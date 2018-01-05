@@ -13,6 +13,11 @@ $config = [
         'user' => 'mysql',
         'password' => '1111',
         'name' => 'test',
+    ],
+    'sendBackupFileToTelegram' => [
+        'active' => true,
+        'chatId' => '0000000',
+        'token' => '0000000'
     ]
 ];
 

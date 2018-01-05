@@ -10,10 +10,12 @@ class Backuper{
     protected $doFiles = true;
     protected $doDb = true;
     protected $nameFile = '';
+    protected $nameFileWithPath = '';
     protected $extFileTar = '.tar';
     protected $outputFolder = 'backups';
     protected $rootFolderName = 'backuper';
     protected $excluded = [];
+    protected $tgChatIdForSendBackupFile = false;
     protected $nameDb = '';
     protected $dbHost = 'localhost';
     protected $dbUser = 'mysql';
@@ -28,14 +30,16 @@ class Backuper{
 
     public static function Factory($options) {
         // подключение вспомогательных классов
-        require_once 'Tar.php';
+        self::requireLibs();
 
         $item = new Backuper();
         $item->makeOutputFolder();
         $item->setOptions($options);
         $item->makeNameFile();
 
-        $item->tar = new Archive_Tar($item->outputFolder . DIRECTORY_SEPARATOR . $item->nameFile . $item->extFileTar);
+        $item->nameFileWithPath = $item->outputFolder . DIRECTORY_SEPARATOR . $item->nameFile . $item->extFileTar;
+
+        $item->tar = new Archive_Tar($item->nameFileWithPath);
         $item->tar->_debug = true;
 
         // for debug
@@ -47,6 +51,11 @@ class Backuper{
         }
 
         return $item;
+    }
+
+    protected static function requireLibs() {
+        require_once 'Tar.php';
+        require_once 'Telegram.php';
     }
 
     public function makeBackupFiles() {
@@ -67,6 +76,9 @@ class Backuper{
         }
         if ($this->doFiles) {
             $this->makeBackupFiles();
+        }
+        if ($this->tgChatIdForSendBackupFile) {
+
         }
         $this->deleteDbFile();
     }
@@ -111,6 +123,13 @@ class Backuper{
         }
     }
 
+    protected function sendFilesToTelegram() {
+        $fullNameFile = $this->root . DIRECTORY_SEPARATOR. $this->rootFolderName . DIRECTORY_SEPARATOR . $this->nameFileWithPath;
+        if (is_file($fullNameFile)) {
+
+        }
+    }
+
     protected function setOptions($options) {
         if (!$options['files']['active']) {
             $this->doFiles = false;
@@ -128,6 +147,10 @@ class Backuper{
         $this->dbName = $options['db']['name'];
         $this->dbUser = $options['db']['user'];
         $this->dbPass = $options['db']['password'];
+
+        if ($options['sendBackupFileToTelegram']['active']) {
+            $this->tgChatIdForSendBackupFile = $options['sendBackupFileToTelegram']['chatId'];
+        }
 
     }
 
