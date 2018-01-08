@@ -5,7 +5,7 @@ $config = [
     'files' => [
         'active' => true,                // активность
         'excludedFolders' => [          //папки исключения
-            'site/backup'               //может быть вариант site/backup
+            'site/backup'               //может быть вариант site\backup
         ],
     ],
     'db' => [
