@@ -6,6 +6,7 @@ class Backuper{
      * @var Archive_Tar
      */
     protected $tar;
+    protected $ds = '/';
     protected $root;
     protected $doFiles = true;
     protected $doDb = true;
@@ -27,7 +28,6 @@ class Backuper{
     protected function __construct(){
         $this->root = dirname(__DIR__);
         $this->root = dirname($this->root);
-        $this->excluded = ['..' . DIRECTORY_SEPARATOR . 'backuper'];
     }
 
     public static function Factory($options) {
@@ -39,20 +39,24 @@ class Backuper{
         $item->setOptions($options);
         $item->makeNameFile();
 
-        $item->nameFileWithPath = $item->outputFolder . DIRECTORY_SEPARATOR . $item->nameFile . $item->extFileTar;
+        $item->nameFileWithPath = $item->outputFolder . $item->ds . $item->nameFile . $item->extFileTar;
 
         $item->tar = new Archive_Tar($item->nameFileWithPath);
-        $item->tar->_debug = true;
+        //$item->tar->_debug = true;
 
         // for debug
-        $nameFile = $item->root . DIRECTORY_SEPARATOR . $item->rootFolderName .
-            DIRECTORY_SEPARATOR. $item->outputFolder .
-            DIRECTORY_SEPARATOR. $item->nameFile . $item->extFileTar;
+        $item->deleteOldFile();
+
+        return $item;
+    }
+
+    protected function deleteOldFile() {
+        $nameFile = $this->root . $this->ds . $this->rootFolderName .
+            $this->ds. $this->outputFolder .
+            $this->ds. $this->nameFile . $this->extFileTar;
         if (file_exists($nameFile)) {
             unlink($nameFile);
         }
-
-        return $item;
     }
 
     protected static function requireLibs() {
@@ -66,7 +70,7 @@ class Backuper{
     }
 
     public function makeBackupDb() {
-        $fullFileName = '..' . DIRECTORY_SEPARATOR . $this->nameFile . '.sql';
+        $fullFileName = '..' . $this->ds . $this->nameFile . '.sql';
         $command = 'mysqldump -h ' . $this->dbHost . ' -u ' . $this->dbUser . ' -p' . $this->dbPass . ' ' . $this->dbName. ' > ' . $fullFileName;
        shell_exec($command);
       // $this->addFileToTar($this->nameFile . '.sql');
@@ -86,14 +90,14 @@ class Backuper{
     }
 
     protected function deleteDbFile() {
-        $nameFileDb = $this->root . DIRECTORY_SEPARATOR . $this->nameFile . '.sql';
+        $nameFileDb = $this->root . $this->ds . $this->nameFile . '.sql';
         if (file_exists($nameFileDb)) {
             unlink($nameFileDb);
         }
     }
 
     protected function addFilesToTar() {
-        foreach (glob($this->root . DIRECTORY_SEPARATOR . '*') as $file) {
+        foreach (glob($this->root . $this->ds . '*') as $file) {
             $nameFile = basename($file);
             if ($nameFile == $this->rootFolderName) {
                 continue;
@@ -103,13 +107,13 @@ class Backuper{
     }
 
     protected function addFileToTar($path) {
-        $this->tar->add(['..' . DIRECTORY_SEPARATOR . $path]);
+        $this->tar->add(['..' . $this->ds . $path]);
     }
 
     protected function getListIgnoreFiles() {
         $res = [];
         foreach ($this->excluded as $file) {
-            $res[] = '..' . DIRECTORY_SEPARATOR . $file;
+            $res[] = '..' . $this->ds . $file;
         }
         return $res;
     }
@@ -119,14 +123,14 @@ class Backuper{
     }
 
     protected function makeOutputFolder() {
-        $folder = $this->root . DIRECTORY_SEPARATOR. $this->rootFolderName . DIRECTORY_SEPARATOR . $this->outputFolder;
+        $folder = $this->root . $this->ds . $this->rootFolderName . $this->ds . $this->outputFolder;
         if (!file_exists($folder)) {
             mkdir($folder);
         }
     }
 
     protected function sendFilesToTelegram() {
-        $fullNameFile = $this->root . DIRECTORY_SEPARATOR. $this->rootFolderName . DIRECTORY_SEPARATOR . $this->nameFileWithPath;
+        $fullNameFile = $this->root . $this->ds. $this->rootFolderName . $this->ds . $this->nameFileWithPath;
         if (is_file($fullNameFile)) {
             $tg = new Telegram($this->tgToken,$this->tgChatIdForSendBackupFile);
             $msg = $this->tgNameForSendBackupFile;
