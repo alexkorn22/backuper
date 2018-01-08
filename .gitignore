@@ -1,4 +1,5 @@
 /.idea
 /www/backuper/backups/*
+/www/test/*
 !/www/backuper/backups/.htaccess
 /www/backuper/config.php
