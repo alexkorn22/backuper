@@ -1,7 +1,7 @@
 <?php
+
 ini_set('max_execution_time', 0);
 date_default_timezone_set('Europe/Kiev');
-
 //TOKEN
 define('TOKEN', '1111');
 //requires

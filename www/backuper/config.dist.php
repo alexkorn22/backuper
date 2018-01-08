@@ -17,7 +17,8 @@ $config = [
     'sendBackupFileToTelegram' => [
         'active' => true,
         'chatId' => '0000000',
-        'token' => '0000000'
+        'token' => '0000000',
+        'name' => 'backuper.loc'
     ]
 ];
 

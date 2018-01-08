@@ -16,6 +16,8 @@ class Backuper{
     protected $rootFolderName = 'backuper';
     protected $excluded = [];
     protected $tgChatIdForSendBackupFile = false;
+    protected $tgNameForSendBackupFile = '';
+    protected $tgToken = '';
     protected $nameDb = '';
     protected $dbHost = 'localhost';
     protected $dbUser = 'mysql';
@@ -78,7 +80,7 @@ class Backuper{
             $this->makeBackupFiles();
         }
         if ($this->tgChatIdForSendBackupFile) {
-
+            $this->sendFilesToTelegram();
         }
         $this->deleteDbFile();
     }
@@ -126,7 +128,11 @@ class Backuper{
     protected function sendFilesToTelegram() {
         $fullNameFile = $this->root . DIRECTORY_SEPARATOR. $this->rootFolderName . DIRECTORY_SEPARATOR . $this->nameFileWithPath;
         if (is_file($fullNameFile)) {
-
+            $tg = new Telegram($this->tgToken,$this->tgChatIdForSendBackupFile);
+            $msg = $this->tgNameForSendBackupFile;
+            $msg .= ' ' . date('Y m d');
+            $tg->sendMessage($msg);
+            $tg->sendFile($fullNameFile);
         }
     }
 
@@ -150,6 +156,8 @@ class Backuper{
 
         if ($options['sendBackupFileToTelegram']['active']) {
             $this->tgChatIdForSendBackupFile = $options['sendBackupFileToTelegram']['chatId'];
+            $this->tgNameForSendBackupFile = $options['sendBackupFileToTelegram']['name'];
+            $this->tgToken = $options['sendBackupFileToTelegram']['token'];
         }
 
     }
